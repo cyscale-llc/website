@@ -213,3 +213,6 @@ p { margin: 0 0 1rem; max-width: var(--measure); }
 .doc { max-width: 44rem; margin: 0 auto; padding: 2rem var(--gutter) 5rem; }
 .doc h1 { font-size: 2.4rem; font-weight: 800; letter-spacing: -.035em; margin-bottom: 1.5rem; }
 .doc h2 { font-size: 1.3rem; margin: 2rem 0 .75rem; }
+
+/* Square badges carry more visual weight than round ones; scale them to match. */
+.badge-art img.square { width: 84%; height: 84%; border-radius: 6px; }

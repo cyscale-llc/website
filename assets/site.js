@@ -68,6 +68,7 @@
           var img = new Image();
           img.alt = c.short + " badge";
           img.onload = function () { art.innerHTML = ""; art.appendChild(img); };
+          if (c.shape === "square") img.className = "square";
           img.src = "assets/badges/" + c.id + ".png";
           art.appendChild(text);
           var name = document.createElement("div"); name.className = "badge-name";
