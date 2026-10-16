@@ -66,7 +66,7 @@
           var art = document.createElement("div"); art.className = "badge-art";
           var text = document.createElement("span"); text.className = "badge-text"; text.textContent = c.short;
           var img = new Image();
-          img.alt = c.short + " badge"; img.loading = "lazy";
+          img.alt = c.short + " badge";
           img.onload = function () { art.innerHTML = ""; art.appendChild(img); };
           img.src = "assets/badges/" + c.id + ".png";
           art.appendChild(text);
