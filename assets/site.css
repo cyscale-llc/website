@@ -236,3 +236,6 @@ p { margin: 0 0 1rem; max-width: var(--measure); }
 .form-sent:focus { outline: none; }
 
 [hidden] { display: none !important; }
+
+/* HubSpot form frame: styling inside the frame is set in HubSpot's form Style tab */
+.hs-form-frame { min-height: 24rem; }

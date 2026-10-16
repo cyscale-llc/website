@@ -92,9 +92,9 @@
   // HUBSPOT: public identifiers only (portal and form IDs are visible on any HubSpot-powered page).
   // Never place API keys or private-app tokens in this repository.
   //   tracking: loads HubSpot's tracking code and cookie banner (banner is configured in HubSpot).
-  //   formId:   when set, HubSpot's embedded form replaces the native form below.
-  //             When empty, the native form is captured by HubSpot's "non-HubSpot forms" collection.
-  var HUBSPOT = { portalId: "246437985", region: "na2", tracking: true, formId: "" };
+  //   formId:   HubSpot form ("New contact us form"); has CAPTCHA and notifications configured in HubSpot.
+  //             The native form is the fallback, captured by HubSpot's "non-HubSpot forms" collection.
+  var HUBSPOT = { portalId: "246437985", region: "na2", tracking: true, formId: "b23eb6c8-7cb2-40a1-95a5-7faa74a778f5" };
 
   if (HUBSPOT.tracking) {
     var t = document.createElement("script");
@@ -103,16 +103,25 @@
     document.body.appendChild(t);
   }
 
+  // HubSpot form (new forms editor): renders inside an iframe via HubSpot's embed script.
+  // If it hasn't rendered within 8 seconds (blocked or offline), the native form below stays as a fallback.
   var target = document.getElementById("hubspot-form");
+  var nativeForm = document.getElementById("contact-form");
   if (target && HUBSPOT.formId) {
-    var s = document.createElement("script");
-    s.src = "https://js-" + HUBSPOT.region + ".hsforms.net/forms/embed/v2.js";
-    s.onload = function () {
-      target.innerHTML = "";
-      window.hbspt.forms.create({ region: HUBSPOT.region, portalId: HUBSPOT.portalId, formId: HUBSPOT.formId, target: "#hubspot-form" });
-    };
-    document.head.appendChild(s);
-    return;
+    var frame = document.createElement("div");
+    frame.className = "hs-form-frame";
+    frame.setAttribute("data-region", HUBSPOT.region);
+    frame.setAttribute("data-form-id", HUBSPOT.formId);
+    frame.setAttribute("data-portal-id", HUBSPOT.portalId);
+    if (nativeForm) nativeForm.hidden = true;
+    target.insertBefore(frame, target.firstChild);
+    var es = document.createElement("script");
+    es.src = "https://js-" + HUBSPOT.region + ".hsforms.net/forms/embed/" + HUBSPOT.portalId + ".js";
+    es.defer = true;
+    var fallback = function () { if (!frame.querySelector("iframe, form")) { frame.remove(); if (nativeForm) nativeForm.hidden = false; } };
+    es.onerror = fallback;
+    setTimeout(fallback, 8000);
+    document.head.appendChild(es);
   }
 
   // Native form: validate, screen out obvious bots, then let HubSpot's collected-forms listener record it.
