@@ -51,6 +51,40 @@
     }
   }
 
+  // Credentials: rendered from data/credentials.json. A badge image at assets/badges/<id>.png
+  // is shown when present; otherwise a text badge stands in.
+  var badgeRoot = document.getElementById("badges");
+  if (badgeRoot && window.fetch) {
+    fetch("data/credentials.json").then(function (r) { return r.json(); }).then(function (data) {
+      data.groups.forEach(function (g, gi) {
+        var group = document.createElement("div");
+        group.className = "badge-group" + (gi === 0 ? " primary" : "");
+        var h = document.createElement("h3"); h.textContent = g.issuer; group.appendChild(h);
+        var ul = document.createElement("ul"); ul.className = "badges";
+        g.items.forEach(function (c) {
+          var li = document.createElement("li"); li.className = "badge";
+          var art = document.createElement("div"); art.className = "badge-art";
+          var text = document.createElement("span"); text.className = "badge-text"; text.textContent = c.short;
+          var img = new Image();
+          img.alt = c.short + " badge"; img.loading = "lazy";
+          img.onload = function () { art.innerHTML = ""; art.appendChild(img); };
+          img.src = "assets/badges/" + c.id + ".png";
+          art.appendChild(text);
+          var name = document.createElement("div"); name.className = "badge-name";
+          name.textContent = c.name + " (" + c.short + ")";
+          li.appendChild(art); li.appendChild(name);
+          if (c.verify) {
+            var a = document.createElement("a"); a.className = "badge-verify"; a.href = c.verify;
+            a.rel = "noopener"; a.target = "_blank"; a.textContent = "Verify";
+            li.appendChild(a);
+          }
+          ul.appendChild(li);
+        });
+        group.appendChild(ul); badgeRoot.appendChild(group);
+      });
+    }).catch(function () {});
+  }
+
   var y = document.getElementById("year");
   if (y) y.textContent = new Date().getFullYear();
 
