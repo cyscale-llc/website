@@ -131,7 +131,22 @@
     <p class="caution">Please don't include controlled unclassified information, credentials, or details of an active incident in this form. We'll set up a secure channel when needed.</p>
   </div>
   <div class="contact-form" id="hubspot-form">
-    <p class="form-pending">The contact form will appear here once it is connected to our CRM.</p>
+    <form id="contact-form" class="native-form" action="#" method="post" novalidate>
+      <div class="field-row">
+        <p class="field"><label for="cf-first">First name</label><input id="cf-first" name="firstname" autocomplete="given-name" required></p>
+        <p class="field"><label for="cf-last">Last name</label><input id="cf-last" name="lastname" autocomplete="family-name" required></p>
+      </div>
+      <p class="field"><label for="cf-email">Work email</label><input id="cf-email" name="email" type="email" autocomplete="email" required></p>
+      <p class="field"><label for="cf-company">Company</label><input id="cf-company" name="company" autocomplete="organization" required></p>
+      <p class="field"><label for="cf-message">How can we help?</label><textarea id="cf-message" name="message" rows="4" required></textarea></p>
+      <p class="hp" aria-hidden="true"><label for="cf-website">Leave this field empty</label><input id="cf-website" name="website_hp" tabindex="-1" autocomplete="off"></p>
+      <p class="form-error" id="cf-error" role="alert" hidden></p>
+      <button class="button" type="submit">Send message</button>
+    </form>
+    <div class="form-sent" id="cf-sent" hidden tabindex="-1">
+      <h3>Message sent</h3>
+      <p>Thanks for reaching out. We'll respond within one business day.</p>
+    </div>
   </div>
 </section>
 

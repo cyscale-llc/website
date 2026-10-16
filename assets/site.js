@@ -91,7 +91,18 @@
 
   // HUBSPOT: public identifiers only (portal and form IDs are visible on any HubSpot-powered page).
   // Never place API keys or private-app tokens in this repository.
-  var HUBSPOT = { portalId: "246437985", region: "na2", formId: "" };
+  //   tracking: loads HubSpot's tracking code and cookie banner (banner is configured in HubSpot).
+  //   formId:   when set, HubSpot's embedded form replaces the native form below.
+  //             When empty, the native form is captured by HubSpot's "non-HubSpot forms" collection.
+  var HUBSPOT = { portalId: "246437985", region: "na2", tracking: true, formId: "" };
+
+  if (HUBSPOT.tracking) {
+    var t = document.createElement("script");
+    t.id = "hs-script-loader"; t.async = true; t.defer = true;
+    t.src = "https://js-" + HUBSPOT.region + ".hs-scripts.com/" + HUBSPOT.portalId + ".js";
+    document.body.appendChild(t);
+  }
+
   var target = document.getElementById("hubspot-form");
   if (target && HUBSPOT.formId) {
     var s = document.createElement("script");
@@ -101,5 +112,27 @@
       window.hbspt.forms.create({ region: HUBSPOT.region, portalId: HUBSPOT.portalId, formId: HUBSPOT.formId, target: "#hubspot-form" });
     };
     document.head.appendChild(s);
+    return;
+  }
+
+  // Native form: validate, screen out obvious bots, then let HubSpot's collected-forms listener record it.
+  var form = document.getElementById("contact-form");
+  if (form) {
+    var err = document.getElementById("cf-error");
+    var sent = document.getElementById("cf-sent");
+    var started = Date.now();
+    var labelOf = function (f) { var l = form.querySelector('label[for="' + f.id + '"]'); return l ? l.textContent : "this field"; };
+    var show = function (msg) { err.textContent = msg; err.hidden = false; };
+    var done = function () { form.hidden = true; sent.hidden = false; sent.focus(); };
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+      err.hidden = true;
+      var missing = [].filter.call(form.querySelectorAll("[required]"), function (f) { return !f.value.trim(); });
+      if (missing.length) { show("Fill in " + labelOf(missing[0]).toLowerCase() + " to send your message."); missing[0].focus(); return; }
+      var email = form.elements.email;
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.value.trim())) { show("Enter a valid email address, like name@company.com."); email.focus(); return; }
+      if (form.elements.website_hp.value || Date.now() - started < 2500) { done(); return; } // likely a bot
+      setTimeout(done, 600); // give HubSpot's listener time to send the submission
+    });
   }
 })();
